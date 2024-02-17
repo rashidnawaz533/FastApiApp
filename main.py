@@ -1,7 +1,13 @@
-from typing import Optional, List
-from fastapi import FastAPI, Path, Query
-from pydantic import BaseModel
+from fastapi import FastAPI
+
 from api import users, sections, courses
+
+from db.db_setup import engine
+from db.models import user, course
+
+user.Base.metadata.create_all(bind=engine)
+course.Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
     title="FastApiApp",
     description= "User Management Application",
