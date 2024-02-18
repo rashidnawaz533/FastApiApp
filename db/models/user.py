@@ -16,7 +16,7 @@ class User(Timestamp, Base):
     id = Column(Integer, primary_key=True,index=True)
     email = Column(String(100), unique=True, index=True, nullable=True)
     role = Column(Enum(Role))
-
+    is_active = Column(Boolean, default=False)
     profile = relationship("Profile", back_populates="owner", uselist=False)
 class Profile(Timestamp, Base):
     __tablename__ = "profiles"
@@ -25,7 +25,6 @@ class Profile(Timestamp, Base):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
     bio = Column(Text, nullable=True)
-    is_active = Column(Boolean, default=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     owner = relationship("User", back_populates="profiles")

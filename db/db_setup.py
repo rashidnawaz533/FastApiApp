@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 #SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:Rashid0300@localhost/fastapiapp"
+SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://postgres:Rashid0300@localhost/fastapiapp"
 
 engine = create_engine(
     # SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
