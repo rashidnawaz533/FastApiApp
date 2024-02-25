@@ -1,12 +1,13 @@
-"""empty message
+"""initial migration
 
-Revision ID: a8e6969c1587
+Revision ID: b04b6b065f41
 Revises: 
-Create Date: 2024-02-18 15:45:18.578068
+Create Date: 2024-02-25 15:19:26.402660
 
 """
 import os
 import json
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -14,7 +15,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils
 
 # revision identifiers, used by Alembic.
-revision: str = 'a8e6969c1587'
+revision: str = 'b04b6b065f41'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,18 +26,17 @@ def upgrade() -> None:
     users = op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=True),
+    sa.Column('role', sa.Enum('teacher', 'student', name='role'), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
-    )
-    op.add_column(
-        'users',
-        sa.Column('role', sa.Enum('teacher', 'student', name='role'), nullable=True),
     )
     with open(os.path.join(os.path.dirname(__file__), "../data/students.json")) as f:
         student_data = f.read()
 
     op.bulk_insert(users, json.loads(student_data))
+
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_table('courses',
@@ -55,7 +55,6 @@ def upgrade() -> None:
     sa.Column('first_name', sa.String(length=50), nullable=False),
     sa.Column('last_name', sa.String(length=50), nullable=False),
     sa.Column('bio', sa.Text(), nullable=True),
-    sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
@@ -90,6 +89,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=200), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('type', sa.Enum('lesson', 'quiz', 'assignment', name='contenttype'), nullable=True),
     sa.Column('url', sqlalchemy_utils.types.url.URLType(), nullable=True),
     sa.Column('content', sa.Text(), nullable=True),
     sa.Column('section_id', sa.Integer(), nullable=False),
@@ -97,10 +97,6 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
     sa.PrimaryKeyConstraint('id')
-    )
-    op.add_column(
-        'content_blocks',
-        sa.Column('type', sa.Enum('lesson', 'quiz', 'assignment', name='contenttype'), nullable=True),
     )
     op.create_index(op.f('ix_content_blocks_id'), 'content_blocks', ['id'], unique=False)
     op.create_table('completed_content_blocks',
