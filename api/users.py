@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from db.db_setup import get_db
 from pydantic_schemas.user import UserCreate, User
+from pydantic_schemas.course import Course
+from api.utils.courses import get_user_courses
 from api.utils.users import get_user,get_users,get_user_by_email, create_user
 
 
@@ -29,3 +31,9 @@ async def read_user(user_id: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="user not found")
     return db_user
+
+
+@router.get("/users/{user_id}/courses", response_model=List[Course])
+async def read_user_courses(user_id: int, db: Session = Depends(get_db)):
+    courses = get_user_courses(user_id = user_id, db = db)
+    return courses
